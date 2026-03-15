@@ -73,7 +73,7 @@ function triggerHero() {
 })();
 
 /* ═══════════════════════════════════════════════════════════
-   INTERSECTION OBSERVER — scroll fade-up
+   INTERSECTION OBSERVER — scroll fade-up (all sections)
 ═══════════════════════════════════════════════════════════ */
 (function () {
   const io = new IntersectionObserver((entries) => {
@@ -86,6 +86,27 @@ function triggerHero() {
   }, { threshold: 0.14 });
 
   document.querySelectorAll('.fade-up').forEach(el => io.observe(el));
+})();
+
+/* ═══════════════════════════════════════════════════════════
+   GALLERY — staggered fade-in (index × 80ms, max 600ms)
+═══════════════════════════════════════════════════════════ */
+(function () {
+  const items = Array.from(document.querySelectorAll('.gallery-fade'));
+
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('gallery-visible');
+        io.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.15 });
+
+  items.forEach((item, i) => {
+    item.style.transitionDelay = Math.min(i * 80, 600) + 'ms';
+    io.observe(item);
+  });
 })();
 
 /* ═══════════════════════════════════════════════════════════
@@ -193,7 +214,7 @@ function triggerHero() {
     if (e.key === 'ArrowRight')  nav(1);
   });
 
-  // Hide broken images gracefully
+  // Hide broken images — parent shows gradient placeholder naturally
   document.querySelectorAll('.gallery-item img').forEach(img => {
     img.addEventListener('error', function () {
       this.style.display = 'none';
