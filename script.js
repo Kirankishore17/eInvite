@@ -172,6 +172,64 @@ function triggerHero() {
 })();
 
 /* ═══════════════════════════════════════════════════════════
+   ADD TO CALENDAR — .ics download for Apple / iCal
+═══════════════════════════════════════════════════════════ */
+(function () {
+  const events = {
+    reception: {
+      summary:  'Kirankishore & Ragapriya — Reception',
+      start:    '20260617T133000Z',   // 7:00 PM IST
+      end:      '20260617T153000Z',   // 9:00 PM IST
+      description: 'You are invited to the wedding reception of Kirankishore & Ragapriya. #kiranraga',
+      location: 'Jeevan Jothi Mahal\\, Porur Road\\, Manapakkam\\, Chennai',
+      filename: 'reception-kiranraga.ics',
+    },
+    wedding: {
+      summary:  'Kirankishore & Ragapriya — Wedding',
+      start:    '20260618T023000Z',   // 8:00 AM IST
+      end:      '20260618T040000Z',   // 9:30 AM IST
+      description: 'You are invited to the wedding of Kirankishore & Ragapriya. #kiranraga',
+      location: 'Jeevan Jothi Mahal\\, Porur Road\\, Manapakkam\\, Chennai',
+      filename: 'wedding-kiranraga.ics',
+    },
+  };
+
+  function buildIcs(ev) {
+    return [
+      'BEGIN:VCALENDAR',
+      'VERSION:2.0',
+      'PRODID:-//KiranRaga Wedding//EN',
+      'CALSCALE:GREGORIAN',
+      'METHOD:PUBLISH',
+      'BEGIN:VEVENT',
+      'UID:' + ev.filename + '@kiranraga',
+      'DTSTAMP:20260101T000000Z',
+      'DTSTART:' + ev.start,
+      'DTEND:'   + ev.end,
+      'SUMMARY:' + ev.summary,
+      'DESCRIPTION:' + ev.description,
+      'LOCATION:' + ev.location,
+      'END:VEVENT',
+      'END:VCALENDAR',
+    ].join('\r\n');
+  }
+
+  document.querySelectorAll('.cal-apple').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const ev = events[btn.dataset.event];
+      if (!ev) return;
+      const blob = new Blob([buildIcs(ev)], { type: 'text/calendar;charset=utf-8' });
+      const url  = URL.createObjectURL(blob);
+      const a    = document.createElement('a');
+      a.href     = url;
+      a.download = ev.filename;
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(url), 5000);
+    });
+  });
+})();
+
+/* ═══════════════════════════════════════════════════════════
    COUNTDOWN — Reception June 17 2026 6:30 PM IST (UTC+5:30)
 ═══════════════════════════════════════════════════════════ */
 (function () {

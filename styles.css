@@ -506,6 +506,37 @@ section::before {
   font-family: var(--ff-display); font-size: .95rem; color: var(--heading);
 }
 
+/* Add-to-calendar buttons */
+.cal-row {
+  display: flex;
+  gap: .6rem;
+  margin-top: 1.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+.cal-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: .45rem;
+  padding: .45rem .9rem;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  font-family: var(--ff-body);
+  font-size: .65rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--body-txt);
+  background: transparent;
+  cursor: pointer;
+  transition: border-color .25s, color .25s, background .25s;
+  text-decoration: none;
+}
+.cal-btn svg { width: 14px; height: 14px; flex-shrink: 0; }
+.cal-btn:hover { border-color: var(--deco); color: var(--heading); }
+.cal-apple svg { color: var(--body-txt); }
+.cal-apple:hover svg { color: var(--heading); }
+
 /* Countdown */
 .countdown-wrap {
   margin-top: 3rem;
