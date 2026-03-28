@@ -201,7 +201,7 @@ function triggerHero() {
 })();
 
 /* ═══════════════════════════════════════════════════════════
-   MUSIC TOGGLE
+   MUSIC TOGGLE + AUTOPLAY
 ═══════════════════════════════════════════════════════════ */
 (function () {
   const btn   = document.getElementById('music-toggle');
@@ -209,6 +209,34 @@ function triggerHero() {
   const icon  = document.getElementById('music-icon');
   let   on    = false;
 
+  function startMusic() {
+    audio.volume = 0.55;
+    audio.play().then(() => {
+      icon.textContent = '♪';
+      btn.classList.add('playing');
+      on = true;
+    }).catch(() => {
+      // Autoplay blocked — wait for first user interaction
+    });
+  }
+
+  // Attempt autoplay after loader fades out
+  window.addEventListener('load', () => {
+    setTimeout(startMusic, 2400);
+  });
+
+  // Fallback: play on first interaction if autoplay was blocked
+  function onFirstInteraction() {
+    if (!on) startMusic();
+    document.removeEventListener('click',      onFirstInteraction);
+    document.removeEventListener('touchstart', onFirstInteraction);
+    document.removeEventListener('scroll',     onFirstInteraction);
+  }
+  document.addEventListener('click',      onFirstInteraction, { once: true });
+  document.addEventListener('touchstart', onFirstInteraction, { once: true, passive: true });
+  document.addEventListener('scroll',     onFirstInteraction, { once: true, passive: true });
+
+  // Manual toggle
   btn.addEventListener('click', () => {
     if (on) {
       audio.pause();
@@ -216,13 +244,7 @@ function triggerHero() {
       btn.classList.remove('playing');
       on = false;
     } else {
-      audio.play().then(() => {
-        icon.textContent = '♪';
-        btn.classList.add('playing');
-        on = true;
-      }).catch(() => {
-        // No audio file or autoplay blocked — silent fail
-      });
+      startMusic();
     }
   });
 })();

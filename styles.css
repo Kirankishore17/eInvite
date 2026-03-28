@@ -305,7 +305,8 @@ section { position: relative; z-index: 2; }
   text-align: center;
 }
 
-#blessings { background: var(--bg); }
+#blessings { background: var(--bg); overflow: hidden; }
+#blessings .section-inner { position: relative; z-index: 1; }
 #couple    { background: var(--bg-alt); }
 #events    { background: var(--bg); }
 #venue     { background: var(--bg-alt); }
@@ -375,6 +376,28 @@ section::before {
 }
 .br-hide { display: none; }
 @media (min-width: 600px) { .br-hide { display: inline; } }
+
+/* ═══════════════════════════════════════════════════════════
+   BLESSINGS — BOTANICAL FLORA
+═══════════════════════════════════════════════════════════ */
+.blessings-flora {
+  position: absolute;
+  pointer-events: none;
+  z-index: 0;
+}
+.blessings-flora-tl  { top: 0;    left: 0;  width: 160px; height: 160px; }
+.blessings-flora-tr  { top: 0;    right: 0; width: 160px; height: 160px; }
+.blessings-flora-bl  { bottom: 0; left: 0;  width: 160px; height: 160px; }
+.blessings-flora-br  { bottom: 0; right: 0; width: 160px; height: 160px; }
+.blessings-flora-arch-top { top: 0;    left: 0; width: 100%; height: 52px; }
+.blessings-flora-arch-bot { bottom: 0; left: 0; width: 100%; height: 52px; }
+
+@media (max-width: 480px) {
+  .blessings-flora-tl,
+  .blessings-flora-tr,
+  .blessings-flora-bl,
+  .blessings-flora-br { width: 100px; height: 100px; opacity: 0.7; }
+}
 
 /* ═══════════════════════════════════════════════════════════
    BLESSINGS SECTION
@@ -619,7 +642,8 @@ section::before {
 .deck-card[data-pos="1"] { transform: translateY(14px) scale(.955); opacity: .6;  z-index: 4; }
 .deck-card[data-pos="2"] { transform: translateY(26px) scale(.91);  opacity: .3;  z-index: 3; }
 .deck-card[data-pos="3"],
-.deck-card[data-pos="4"] { transform: translateY(36px) scale(.87);  opacity: 0;   z-index: 2; pointer-events: none; }
+.deck-card[data-pos="4"],
+.deck-card[data-pos="5"] { transform: translateY(36px) scale(.87);  opacity: 0;   z-index: 2; pointer-events: none; }
 
 /* Fly-off to the left */
 .deck-card.fly-left {
