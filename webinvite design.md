@@ -71,6 +71,9 @@ Venue:  Jeevan Jothi Mahal, Porur Road, Manapakkam, Chennai
 Reception Date: June 17 2026
 
 ---
+#1A0A00
+#C8A84B
+#8B6914
 
 # Required Website Sections
 

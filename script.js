@@ -89,24 +89,86 @@ function triggerHero() {
 })();
 
 /* ═══════════════════════════════════════════════════════════
-   GALLERY — staggered fade-in (index × 80ms, max 600ms)
+   STACKED CARD DECK
 ═══════════════════════════════════════════════════════════ */
 (function () {
-  const items = Array.from(document.querySelectorAll('.gallery-fade'));
+  const deck    = document.getElementById('card-deck');
+  if (!deck) return;
 
-  const io = new IntersectionObserver((entries) => {
-    entries.forEach(e => {
-      if (e.isIntersecting) {
-        e.target.classList.add('gallery-visible');
-        io.unobserve(e.target);
-      }
+  const cards   = Array.from(deck.querySelectorAll('.deck-card'));
+  const counter = document.getElementById('deck-counter');
+  const btnPrev = document.querySelector('.deck-prev');
+  const btnNext = document.querySelector('.deck-next');
+  const total   = cards.length;
+  let animating = false;
+  let step      = 1;
+
+  // order[i] = which card index is at visual position i (0 = front)
+  let order = cards.map((_, i) => i);
+
+  function applyPositions() {
+    order.forEach((cardIdx, pos) => {
+      cards[cardIdx].setAttribute('data-pos', Math.min(pos, total - 1));
     });
-  }, { threshold: 0.15 });
+    counter.textContent = step + ' OF ' + total;
+    btnPrev.disabled = step <= 1;
+    btnNext.disabled = step >= total;
+  }
 
-  items.forEach((item, i) => {
-    item.style.transitionDelay = Math.min(i * 80, 600) + 'ms';
-    io.observe(item);
+  function next() {
+    if (animating || step >= total) return;
+    animating = true;
+
+    const frontIdx = order[0];
+    cards[frontIdx].classList.add('fly-left');
+
+    setTimeout(() => {
+      cards[frontIdx].classList.remove('fly-left');
+      order.push(order.shift());  // rotate front → back
+      step++;
+      applyPositions();
+      animating = false;
+    }, 440);
+  }
+
+  function prev() {
+    if (animating || step <= 1) return;
+    animating = true;
+
+    // Last card returns from the left
+    const lastIdx = order[order.length - 1];
+    cards[lastIdx].classList.add('from-left');
+
+    // Double rAF: set position then remove from-left to trigger transition
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        order.unshift(order.pop());  // rotate back → front
+        step--;
+        applyPositions();
+        cards[lastIdx].classList.remove('from-left');
+        setTimeout(() => { animating = false; }, 440);
+      });
+    });
+  }
+
+  applyPositions();
+
+  btnNext.addEventListener('click', next);
+  btnPrev.addEventListener('click', prev);
+
+  // Tap front card = advance
+  deck.addEventListener('click', e => {
+    const card = e.target.closest('.deck-card');
+    if (card && card.getAttribute('data-pos') === '0') next();
   });
+
+  // Touch swipe
+  let tx0 = 0;
+  deck.addEventListener('touchstart', e => { tx0 = e.touches[0].clientX; }, { passive: true });
+  deck.addEventListener('touchend',   e => {
+    const dx = e.changedTouches[0].clientX - tx0;
+    if (Math.abs(dx) > 45) dx < 0 ? next() : prev();
+  }, { passive: true });
 })();
 
 /* ═══════════════════════════════════════════════════════════
@@ -165,59 +227,3 @@ function triggerHero() {
   });
 })();
 
-/* ═══════════════════════════════════════════════════════════
-   GALLERY LIGHTBOX
-═══════════════════════════════════════════════════════════ */
-(function () {
-  const lb      = document.getElementById('lightbox');
-  const lbImg   = document.getElementById('lb-img');
-  const btnClose = document.getElementById('lb-close');
-  const btnPrev  = document.getElementById('lb-prev');
-  const btnNext  = document.getElementById('lb-next');
-
-  const items = Array.from(document.querySelectorAll('.gallery-item'));
-  let current = 0;
-
-  function open(i) {
-    const img = items[i] && items[i].querySelector('img');
-    if (!img || !img.complete || img.naturalWidth === 0) return;
-    current    = i;
-    lbImg.src  = img.src;
-    lbImg.alt  = img.alt;
-    lb.classList.add('active');
-    document.body.style.overflow = 'hidden';
-  }
-
-  function close() {
-    lb.classList.remove('active');
-    document.body.style.overflow = '';
-    setTimeout(() => { lbImg.src = ''; }, 350);
-  }
-
-  function nav(dir) {
-    current = (current + dir + items.length) % items.length;
-    const img = items[current].querySelector('img');
-    lbImg.src = img ? img.src : '';
-    lbImg.alt = img ? img.alt : '';
-  }
-
-  items.forEach((item, i) => item.addEventListener('click', () => open(i)));
-  btnClose.addEventListener('click', close);
-  btnPrev.addEventListener('click',  () => nav(-1));
-  btnNext.addEventListener('click',  () => nav(1));
-  lb.addEventListener('click', e => { if (e.target === lb) close(); });
-
-  document.addEventListener('keydown', e => {
-    if (!lb.classList.contains('active')) return;
-    if (e.key === 'Escape')      close();
-    if (e.key === 'ArrowLeft')   nav(-1);
-    if (e.key === 'ArrowRight')  nav(1);
-  });
-
-  // Hide broken images — parent shows gradient placeholder naturally
-  document.querySelectorAll('.gallery-item img').forEach(img => {
-    img.addEventListener('error', function () {
-      this.style.display = 'none';
-    });
-  });
-})();
